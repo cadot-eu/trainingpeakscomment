@@ -1,3 +1,4 @@
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && /^http/.test(tab.url)) {
         chrome.scripting.insertCSS({
@@ -20,7 +21,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'get_name') {
+    if (request.message === 'get_name') {
         chrome.storage.local.get('name', data => {
             if (chrome.runtime.lastError) {
                 sendResponse({
@@ -37,9 +38,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
 
         return true;
-    } else if (request.action === 'add') {
+    } else if (request.message === 'change_name') {
         chrome.storage.local.set({
-            date: cmessage
+            name: request.payload
         }, () => {
             if (chrome.runtime.lastError) {
                 sendResponse({ message: 'fail' });
@@ -50,5 +51,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         })
 
         return true;
+    }
+});
+
+
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        console.log(
+            `Storage key "${key}" in namespace "${namespace}" changed.`,
+            `Old value was "${oldValue}", new value is "${newValue}".`
+        );
     }
 });
