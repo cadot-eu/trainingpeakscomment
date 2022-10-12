@@ -11,6 +11,9 @@ setInterval(function () {
 }, 60000);//on recherche des nouveaux messages toutes les minutes
 
 
+
+
+
 function seek() {
     var checkExist = setInterval(function () {
         if (document.querySelectorAll('.commentCounter').length) {
@@ -28,39 +31,40 @@ function seek() {
                         if (document.querySelectorAll('.comment').length) {
                             clearInterval(checkExist2);
                             let comments = document.querySelectorAll('.comment');
-                            //let messages = '';
                             for (var i = 0; i < Number(numero) - Number(localStorage.getItem(jour)); i++) {
                                 let cname = comments[i].querySelector('.commentHeader>.name').textContent
                                 let cdate = comments[i].querySelector('.commentHeader>.date').textContent
                                 let cmessage = comments[i].querySelector('.commentBody').textContent
                                 notifyMe("Nouveau commentaire", cname + " " + "(" + cdate + ")\n" + cmessage)
-                                //messages.push({ name: cname, date: cdate, message: cmessage })
+                                localStorage.setItem(jour, numero);
+                                chrome.runtime.sendMessage({
+                                    message: "add_mess",
+                                    date: cdate,
+                                    mess: cmessage,
+                                    name: cname
+                                }, response => {
+                                    if (response.message === 'success') {
+                                        console.log('message posté')
+                                    }
+                                });
                             }
-                            // chrome.runtime.sendMessage({
-                            //     message: "change_name",
-                            //     payload: messages
-                            // }, response => {
-                            //     if (response.message === 'success') {
-                            //         console.log('ok')
-                            //     }
-                            // });
+
                         }
                     }, 300);
-                    // var checkExist3 = setInterval(function () {
-                    //     if (document.getElementById('closeIcon')) {
-                    //         clearInterval(checkExist3);
-                    //         document.getElementById('closeIcon').click()
-                    //     }
-                    // }, 300);
+
                 }
                 else {
                     localStorage.setItem(jour, numero);
-                }
 
+                }
             })
         }
     }, 500); // check every 100ms
+
 }
+
+
+
 function notifyMe(title, body) {
     if (Notification.permission !== 'granted') {
         Notification.requestPermission();

@@ -21,26 +21,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.message === 'get_name') {
-        chrome.storage.local.get('name', data => {
-            if (chrome.runtime.lastError) {
-                sendResponse({
-                    message: 'fail'
-                });
-
-                return;
-            }
-
-            sendResponse({
-                message: 'success',
-                payload: data.name
-            });
-        });
-
-        return true;
-    } else if (request.message === 'change_name') {
+    if (request.message === 'add_mess') {
         chrome.storage.local.set({
-            name: request.payload
+            messages: JSON.stringify({ date: request.date, name: request.name, mess: request.mess })
         }, () => {
             if (chrome.runtime.lastError) {
                 sendResponse({ message: 'fail' });
@@ -52,14 +35,97 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         return true;
     }
-});
+    else if (request.message === 'get_mess') {
+        chrome.storage.local.get('messages', data => {
+            if (chrome.runtime.lastError) {
+                sendResponse({
+                    message: 'fail'
+                });
 
+                return;
+            }
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        console.log(
-            `Storage key "${key}" in namespace "${namespace}" changed.`,
-            `Old value was "${oldValue}", new value is "${newValue}".`
-        );
+            sendResponse({
+                message: 'success',
+                messages: data
+            });
+        });
+
+        return true;
     }
-});
+
+})
+
+
+
+
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//     if (request.message === 'add_comment') {
+//         chrome.storage.local.set({
+//             messages: JSON.stringify({ date: request.date, name: request.name, message: request.mess })
+//         }, () => {
+//             if (chrome.runtime.lastError) {
+//                 sendResponse({ message: 'fail' });
+//                 return;
+//             }
+
+//             sendResponse({ message: 'success' });
+//         })
+
+//         return true;
+//     }
+//     else if (request.message === 'get_comments') {
+//         chrome.storage.local.get('messages', data => {
+//             if (chrome.runtime.lastError) {
+//                 sendResponse({
+//                     message: 'fail'
+//                 });
+
+//                 return;
+//             }
+
+//             sendResponse({
+//                 message: 'success',
+//                 messages: data
+//             });
+//         });
+
+//         return true;
+//     }
+//     else if (request.message === 'get_name') {
+//         chrome.storage.local.get('name', data => {
+//             if (chrome.runtime.lastError) {
+//                 sendResponse({
+//                     message: 'fail'
+//                 });
+
+//                 return;
+//             }
+
+//             sendResponse({
+//                 message: 'success',
+//                 payload: data.name
+//             });
+//         });
+
+//         return true;
+//     } else if (request.message === 'add_date') {
+//         let date = request.date
+//         let nombrecomments = request.nombrecomments
+//         console.log(date + nombrecomments)
+//         chrome.storage.local.set({
+//             date: request.payload
+//         }, () => {
+//             if (chrome.runtime.lastError) {
+//                 sendResponse({ message: 'fail' });
+//                 return;
+//             }
+
+//             sendResponse({ message: 'success' });
+//         })
+
+//         return true;
+//     }
+// });
+
+

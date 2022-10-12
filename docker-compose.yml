@@ -1,0 +1,11 @@
+version: '3'
+services:
+  trainingpeakscomment:
+    image: cadoteu/symfony5-6-runsite
+    container_name: trainingpeakscomment
+    volumes:
+      - .:/app
+    restart: always
+    ports:
+      - 80
+ 
